@@ -159,3 +159,7 @@ End users running the published `.exe` files do not need the .NET runtime instal
 ## Technical Notes
 
 Short implementation notes are available in [docs/technical-notes.md](docs/technical-notes.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
