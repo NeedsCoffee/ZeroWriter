@@ -39,6 +39,8 @@ public sealed class ShutdownCoordinator : IDisposable
 
     private void RequestShutdown()
     {
+        // Process-exit and unhandled-exception hooks are the last chance to remove
+        // temporary wipe files if normal control flow is interrupted.
         RequestCancellation();
         cleanup?.Invoke();
     }

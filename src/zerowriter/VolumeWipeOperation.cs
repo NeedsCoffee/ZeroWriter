@@ -21,6 +21,8 @@ public sealed class VolumeWipeOperation
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(volumeRoot);
 
+        // Keep all generated wipe files under a unique hidden-ish workspace so
+        // cleanup can remove only files created by this operation.
         var workspacePath = Path.Combine(volumeRoot, $".zerowriter-{Guid.NewGuid():N}");
         return new VolumeWipeOperation(volumeRoot, workspacePath);
     }

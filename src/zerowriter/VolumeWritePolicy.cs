@@ -2,6 +2,8 @@ namespace Zerowriter;
 
 public sealed class VolumeWritePolicy
 {
+    // FAT32's maximum file size is just under 4 GiB. Staying slightly below the
+    // boundary avoids edge-case failures from filesystem and API rounding.
     public const long Fat32SafeMaxFileSizeBytes = (4L * 1024L * 1024L * 1024L) - (1L * 1024L * 1024L);
 
     private VolumeWritePolicy(string driveFormat, long? maxFileSizeBytes, bool usedFat32AutoCap, bool wasClampedToFilesystemLimit)

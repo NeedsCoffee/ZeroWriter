@@ -33,6 +33,8 @@ public static class ZeroFillEngine
         var buffers = normalizedChunkSizes.ToDictionary(size => size, size => new byte[size]);
         long bytesWritten = 0;
 
+        // Try large writes first for throughput, then smaller writes to consume the
+        // remaining free space as closely as the filesystem will allow.
         foreach (var chunkSize in normalizedChunkSizes)
         {
             while (maxBytesToWrite is null || bytesWritten < maxBytesToWrite.Value)
@@ -57,6 +59,8 @@ public static class ZeroFillEngine
                 }
                 catch (IOException ex) when (IsDiskFull(ex))
                 {
+                    // Running out of free space is the expected terminal condition
+                    // for a wipe pass, not a failure that should escape to the CLI.
                     break;
                 }
             }

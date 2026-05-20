@@ -62,6 +62,9 @@ public sealed class VolumeZeroWriter
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Each pass uses a fresh temp file so filesystems with per-file size
+                // limits, especially FAT32, can still have all available space filled.
                 var wipeFilePath = operation.CreateNextWipeFilePath();
                 Stream stream;
                 try
@@ -75,54 +78,54 @@ public sealed class VolumeZeroWriter
 
                 await using (stream)
                 {
-                var bytesWrittenThisFile = await ZeroFillEngine.FillAsync(
-                    stream,
-                    ChunkSizes,
-                    cancellationToken,
-                    _ =>
+                    var bytesWrittenThisFile = await ZeroFillEngine.FillAsync(
+                        stream,
+                        ChunkSizes,
+                        cancellationToken,
+                        _ =>
+                        {
+                            var currentFreeSpace = GetAvailableFreeSpace(operation.VolumeRoot);
+                            var snapshot = progressReporter.CreateSnapshot(currentFreeSpace);
+                            var shouldReport =
+                                snapshot.BytesConsumed == 0 ||
+                                snapshot.BytesConsumed - lastReportedBytes >= 4L * 1024 * 1024 ||
+                                stopwatch.Elapsed >= TimeSpan.FromMilliseconds(100) ||
+                                snapshot.BytesRemaining == 0;
+
+                            if (!shouldReport)
+                            {
+                                return;
+                            }
+
+                            lastReportedBytes = snapshot.BytesConsumed;
+                            stopwatch.Restart();
+
+                            var line = ProgressReporter.Render(snapshot);
+                            if (Console.IsOutputRedirected)
+                            {
+                                Console.WriteLine(line);
+                            }
+                            else
+                            {
+                                Console.Write('\r');
+                                Console.Write(line.PadRight(lastLineLength));
+                                lastLineLength = Math.Max(lastLineLength, line.Length);
+                                displayedProgress = true;
+                            }
+                        },
+                        policy.MaxFileSizeBytes);
+
+                    totalBytesWritten += bytesWrittenThisFile;
+
+                    if (bytesWrittenThisFile == 0)
                     {
-                        var currentFreeSpace = GetAvailableFreeSpace(operation.VolumeRoot);
-                        var snapshot = progressReporter.CreateSnapshot(currentFreeSpace);
-                        var shouldReport =
-                            snapshot.BytesConsumed == 0 ||
-                            snapshot.BytesConsumed - lastReportedBytes >= 4L * 1024 * 1024 ||
-                            stopwatch.Elapsed >= TimeSpan.FromMilliseconds(100) ||
-                            snapshot.BytesRemaining == 0;
+                        break;
+                    }
 
-                        if (!shouldReport)
-                        {
-                            return;
-                        }
-
-                        lastReportedBytes = snapshot.BytesConsumed;
-                        stopwatch.Restart();
-
-                        var line = ProgressReporter.Render(snapshot);
-                        if (Console.IsOutputRedirected)
-                        {
-                            Console.WriteLine(line);
-                        }
-                        else
-                        {
-                            Console.Write('\r');
-                            Console.Write(line.PadRight(lastLineLength));
-                            lastLineLength = Math.Max(lastLineLength, line.Length);
-                            displayedProgress = true;
-                        }
-                    },
-                    policy.MaxFileSizeBytes);
-
-                totalBytesWritten += bytesWrittenThisFile;
-
-                if (bytesWrittenThisFile == 0)
-                {
-                    break;
-                }
-
-                if (policy.MaxFileSizeBytes is null || bytesWrittenThisFile < policy.MaxFileSizeBytes.Value)
-                {
-                    break;
-                }
+                    if (policy.MaxFileSizeBytes is null || bytesWrittenThisFile < policy.MaxFileSizeBytes.Value)
+                    {
+                        break;
+                    }
                 }
             }
 

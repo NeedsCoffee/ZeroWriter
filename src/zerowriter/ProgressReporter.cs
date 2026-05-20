@@ -36,6 +36,8 @@ public sealed class ProgressReporter
         double? bytesPerSecond = null;
         TimeSpan? eta = null;
 
+        // Estimate speed from a rolling window of samples rather than the latest
+        // write callback, which keeps the display useful during bursty disk I/O.
         if (samples.Count >= 2 && (previousSample is null || bytesConsumed > previousSample.Value.BytesConsumed))
         {
             var first = samples.Peek();
@@ -52,6 +54,8 @@ public sealed class ProgressReporter
             }
         }
 
+        // Suppress early estimates until there is enough movement to avoid showing
+        // misleading speeds and ETAs during startup.
         if (measuredUpdateCount >= 2)
         {
             bytesPerSecond ??= lastKnownBytesPerSecond;
