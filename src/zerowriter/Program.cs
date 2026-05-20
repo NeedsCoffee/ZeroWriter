@@ -85,7 +85,7 @@ finally
 static void PrintUsage()
 {
     Console.Error.WriteLine("Usage: zerowriter <drive-letter> [--max-file-size <size>]");
-    Console.Error.WriteLine("Example: zerowriter C: --max-file-size 4095MiB");
+    Console.Error.WriteLine("Example: zerowriter C: --max-file-size 4095m");
 }
 
 static string DescribeMaxFileSize(VolumeWritePolicy policy) =>

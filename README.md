@@ -41,8 +41,8 @@ Examples:
 
 ```powershell
 zerowriter E:
-zerowriter F: --max-file-size 2GiB
-zerowriter G --max-file-size 4095MiB
+zerowriter F: --max-file-size 2g
+zerowriter G --max-file-size 4095m
 ```
 
 Accepted drive-letter forms:
@@ -53,16 +53,19 @@ Accepted drive-letter forms:
 Accepted size suffixes for `--max-file-size`:
 
 - `B`
+- `K`, `KB`
 - `KiB`
+- `M`, `MB`
 - `MiB`
+- `G`, `GB`
 - `GiB`
 - `TiB`
 
 Examples:
 
 - `1048576`
-- `512MiB`
-- `4GiB`
+- `512m`
+- `4gb`
 
 ## Progress Display
 

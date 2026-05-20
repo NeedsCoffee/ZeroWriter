@@ -59,11 +59,11 @@ public sealed class AppOptions
         var multiplier = suffix switch
         {
             "" or "B" => 1L,
-            "KIB" => 1024L,
-            "MIB" => 1024L * 1024L,
-            "GIB" => 1024L * 1024L * 1024L,
+            "K" or "KB" or "KIB" => 1024L,
+            "M" or "MB" or "MIB" => 1024L * 1024L,
+            "G" or "GB" or "GIB" => 1024L * 1024L * 1024L,
             "TIB" => 1024L * 1024L * 1024L * 1024L,
-            _ => throw new ArgumentException("Unsupported size suffix. Use B, KiB, MiB, GiB, or TiB.", nameof(value))
+            _ => throw new ArgumentException("Unsupported size suffix. Use B, K, KB, KiB, M, MB, MiB, G, GB, GiB, or TiB.", nameof(value))
         };
 
         checked
