@@ -39,13 +39,13 @@ try
         shutdown.Register(operation.Cleanup);
         Console.WriteLine($"Zero-filling free space on {options.VolumeRoot}");
         Console.WriteLine($"Filesystem: {policy.DriveFormat}; max temp file size: {DescribeMaxFileSize(policy)}");
-        if (policy.UsedFat32AutoCap)
+        if (policy.UsedFilesystemAutoCap)
         {
-            Console.WriteLine("Applied FAT32-safe file splitting automatically.");
+            Console.WriteLine($"Applied {policy.DriveFormat}-safe file splitting automatically.");
         }
         else if (policy.WasClampedToFilesystemLimit)
         {
-            Console.WriteLine("Requested max file size exceeded the FAT32 limit and was clamped.");
+            Console.WriteLine($"Requested max file size exceeded the {policy.DriveFormat} limit and was clamped.");
         }
 
         var bytesWritten = await writer.WipeFreeSpaceAsync(operation, policy, shutdown.Token);

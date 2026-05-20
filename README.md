@@ -13,13 +13,13 @@ It is similar in intent to `cipher /W`, but intentionally simpler:
 
 Zerowriter creates temporary wipe files on the target volume and writes zero bytes into them until the volume runs out of free space. When the operation ends or is cancelled, it removes the temporary files and workspace.
 
-The tool automatically adapts to `FAT32` volumes by splitting the wipe data across multiple temporary files so it does not hit the filesystem's 4 GiB file-size ceiling.
+The tool automatically adapts to `FAT16` and `FAT32` volumes by splitting the wipe data across multiple temporary files so it does not hit filesystem file-size ceilings.
 
 ## Features
 
 - Zero-fills free space on a selected Windows volume
-- Supports `FAT32`, `NTFS`, and other standard Windows filesystems
-- Automatically splits wipe files on `FAT32`
+- Supports `FAT16`, `FAT32`, `NTFS`, and other standard Windows filesystems
+- Automatically splits wipe files on filesystems with known per-file limits
 - Optional runtime cap for temporary file size
 - Live text progress bar
 - Rolling speed and ETA display
@@ -82,16 +82,21 @@ Zerowriter stops when the volume can no longer accept more zero-filled data.
 
 That means an internal "disk full" condition is expected at the end of a successful run. The tool treats that as normal completion and should finish with the standard completion message rather than surfacing it as an error.
 
-## FAT32 Behavior
+## FAT Filesystem Behavior
 
-`FAT32` volumes cannot store a single file larger than 4 GiB. Zerowriter detects this automatically and applies a safe maximum temporary file size just below that limit.
+`FAT16` and `FAT32` volumes have per-file size limits. Zerowriter detects these automatically and applies a safe maximum temporary file size just below the relevant limit.
 
-If you provide `--max-file-size` on a `FAT32` volume:
+Current automatic caps:
+
+- `FAT` / `FAT16`: just below 2 GiB
+- `FAT32`: just below 4 GiB
+
+If you provide `--max-file-size` on a capped filesystem:
 
 - values below the safe limit are used
 - values above the safe limit are clamped down automatically
 
-On non-`FAT32` filesystems, no temporary file-size cap is applied unless you explicitly set one.
+On filesystems without a known cap, no temporary file-size cap is applied unless you explicitly set one.
 
 ## Cancellation And Cleanup
 

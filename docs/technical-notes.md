@@ -40,13 +40,13 @@ Zerowriter:
 
 This keeps the implementation simpler and avoids raw volume APIs.
 
-## FAT32 File Splitting
+## FAT Filesystem File Splitting
 
-`FAT32` has a maximum single-file size of 4 GiB. To avoid failing at that boundary, Zerowriter automatically enables a safe per-file cap just below 4 GiB.
+`FAT16` and `FAT32` have maximum single-file sizes. To avoid failing at those boundaries, Zerowriter automatically enables a safe per-file cap just below each filesystem's limit.
 
 Implementation notes:
 
-- the cap is represented by `VolumeWritePolicy.Fat32SafeMaxFileSizeBytes`
+- caps are represented by `VolumeWritePolicy.Fat16SafeMaxFileSizeBytes` and `VolumeWritePolicy.Fat32SafeMaxFileSizeBytes`
 - wipe files are named sequentially:
   - `wipe-0001.bin`
   - `wipe-0002.bin`
@@ -64,7 +64,7 @@ Important behavior:
 - they are not deleted on close
 - the workspace is deleted once the operation ends
 
-This is important for `FAT32`: deleting earlier completed wipe files during the run would free space again and prevent the wipe from ever finishing.
+This is important for capped filesystems: deleting earlier completed wipe files during the run would free space again and prevent the wipe from ever finishing.
 
 `VolumeWipeOperation.Cleanup()` is retry-safe:
 

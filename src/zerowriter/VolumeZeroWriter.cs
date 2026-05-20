@@ -64,7 +64,7 @@ public sealed class VolumeZeroWriter
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Each pass uses a fresh temp file so filesystems with per-file size
-                // limits, especially FAT32, can still have all available space filled.
+                // limits, such as FAT16 and FAT32, can still have all free space filled.
                 var wipeFilePath = operation.CreateNextWipeFilePath();
                 Stream stream;
                 try
