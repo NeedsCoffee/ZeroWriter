@@ -56,9 +56,9 @@ public sealed class ProgressReporterTests
 
         Assert.Contains("[####------]", line);
         Assert.Contains("40.0%", line);
-        Assert.Contains("400 B / 1000 B", line);
-        Assert.Contains("left 600 B", line);
-        Assert.Contains("200 B/s", line);
+        Assert.Contains("400.00 B / 1000.00 B", line);
+        Assert.Contains("left 600.00 B", line);
+        Assert.Contains("200.00 B/s", line);
         Assert.Contains("ETA 00:00:03", line);
     }
 

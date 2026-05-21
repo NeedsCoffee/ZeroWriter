@@ -26,8 +26,12 @@ try
     }
     catch (ArgumentException ex)
     {
-        Console.Error.WriteLine(ex.Message);
-        PrintUsage();
+        if (!string.Equals(ex.Message, CliText.UsageLine, StringComparison.Ordinal))
+        {
+            Console.Error.WriteLine(ex.Message);
+        }
+
+        Console.Error.Write(CliText.RenderUsage(CliText.GetVersion()));
         return 1;
     }
 
@@ -37,6 +41,7 @@ try
         var operation = writer.CreateOperation(options.VolumeRoot);
         var policy = writer.CreatePolicy(options.VolumeRoot, options.RequestedMaxFileSizeBytes);
         shutdown.Register(operation.Cleanup);
+        Console.WriteLine(CliText.RenderHeader(CliText.GetVersion()));
         Console.WriteLine($"Zero-filling free space on {options.VolumeRoot}");
         Console.WriteLine($"Filesystem: {policy.DriveFormat}; max temp file size: {DescribeMaxFileSize(policy)}");
         if (policy.UsedFilesystemAutoCap)
@@ -80,12 +85,6 @@ finally
         {
         }
     }
-}
-
-static void PrintUsage()
-{
-    Console.Error.WriteLine("Usage: zerowriter <drive-letter> [--max-file-size <size>]");
-    Console.Error.WriteLine("Example: zerowriter C: --max-file-size 4095m");
 }
 
 static string DescribeMaxFileSize(VolumeWritePolicy policy) =>

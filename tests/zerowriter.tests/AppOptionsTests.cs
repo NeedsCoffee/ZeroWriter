@@ -19,6 +19,14 @@ public sealed class AppOptionsTests
         Assert.Equal(4_293_918_720L, options.RequestedMaxFileSizeBytes);
     }
 
+    [Fact]
+    public void Parse_AcceptsShortMaxFileSizeOption()
+    {
+        var options = AppOptions.Parse(["E:", "-m", "2g"]);
+
+        Assert.Equal(2L * 1024L * 1024L * 1024L, options.RequestedMaxFileSizeBytes);
+    }
+
     [Theory]
     [InlineData("2g", 2L * 1024L * 1024L * 1024L)]
     [InlineData("2gb", 2L * 1024L * 1024L * 1024L)]

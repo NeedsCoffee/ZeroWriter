@@ -34,7 +34,7 @@ The tool automatically adapts to `FAT16` and `FAT32` volumes by splitting the wi
 Command syntax:
 
 ```powershell
-zerowriter <drive-letter> [--max-file-size <size>]
+zerowriter <drive-letter> [-m|--max-file-size <size>]
 ```
 
 Examples:
@@ -42,7 +42,7 @@ Examples:
 ```powershell
 zerowriter E:
 zerowriter F: --max-file-size 2g
-zerowriter G --max-file-size 4095m
+zerowriter G -m 4095m
 ```
 
 Accepted drive-letter forms:

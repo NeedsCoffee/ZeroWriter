@@ -17,7 +17,7 @@ public sealed class AppOptions
 
         if (args.Length is < 1 or > 3)
         {
-            throw new ArgumentException("Usage: zerowriter <drive-letter> [--max-file-size <size>]");
+            throw new ArgumentException(CliText.UsageLine);
         }
 
         var volumeRoot = VolumePathParser.NormalizeVolumeRoot(args[0]);
@@ -25,9 +25,9 @@ public sealed class AppOptions
 
         if (args.Length > 1)
         {
-            if (args.Length != 3 || !string.Equals(args[1], "--max-file-size", StringComparison.OrdinalIgnoreCase))
+            if (args.Length != 3 || !IsMaxFileSizeOption(args[1]))
             {
-                throw new ArgumentException("Usage: zerowriter <drive-letter> [--max-file-size <size>]");
+                throw new ArgumentException(CliText.UsageLine);
             }
 
             requestedMaxFileSizeBytes = ParseSize(args[2]);
@@ -35,6 +35,10 @@ public sealed class AppOptions
 
         return new AppOptions(volumeRoot, requestedMaxFileSizeBytes);
     }
+
+    private static bool IsMaxFileSizeOption(string value) =>
+        string.Equals(value, "--max-file-size", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(value, "-m", StringComparison.OrdinalIgnoreCase);
 
     private static long ParseSize(string value)
     {

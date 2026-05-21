@@ -154,7 +154,7 @@ public sealed class VolumeZeroWriter
             unitIndex++;
         }
 
-        return $"{size:0.##} {units[unitIndex]}";
+        return $"{size:0.00} {units[unitIndex]}";
     }
 
     private static long GetAvailableFreeSpace(string volumeRoot) => new DriveInfo(volumeRoot).AvailableFreeSpace;
